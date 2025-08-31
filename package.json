@@ -1,0 +1,29 @@
+{
+  "name": "bayern-ticket-checker",
+  "version": "1.0.0",
+  "description": "FCバイエルンミュンヘンのチケット販売状況を監視するツール",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "check": "tsx src/checker.ts",
+    "test": "npx playwright test"
+  },
+  "keywords": ["bayern", "tickets", "checker", "automation"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@playwright/test": "^1.44.0",
+    "playwright": "^1.44.0",
+    "axios": "^1.7.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

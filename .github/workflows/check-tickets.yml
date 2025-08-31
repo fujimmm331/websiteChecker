@@ -1,0 +1,74 @@
+name: FCバイエルン チケットチェック
+
+on:
+  schedule:
+    - cron: '0 */1 * * *'  # 1時間ごと
+  workflow_dispatch:  # 手動実行
+
+jobs:
+  check-tickets:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: チェックアウト
+      uses: actions/checkout@v4
+      
+    - name: Node.js セットアップ
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: 依存関係インストール
+      run: npm ci
+      
+    - name: Playwrightブラウザインストール
+      run: npx playwright install firefox
+      
+    - name: 前回の結果を復元
+      uses: actions/cache/restore@v3
+      with:
+        path: |
+          previous-results.json
+          all-results.json
+        key: bayern-results-${{ github.run_number }}
+        restore-keys: |
+          bayern-results-
+          
+    - name: チケットチェック実行
+      env:
+        BAYERN_USERNAME: ${{ secrets.BAYERN_USERNAME }}
+        BAYERN_PASSWORD: ${{ secrets.BAYERN_PASSWORD }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: npm run check
+      
+    - name: 結果を保存
+      uses: actions/cache/save@v3
+      with:
+        path: |
+          previous-results.json
+          all-results.json
+        key: bayern-results-${{ github.run_number }}
+        
+    - name: GitHub Pages用ファイルをアップロード
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./public
+        
+    - name: GitHub Pagesにデプロイ
+      id: deployment
+      uses: actions/deploy-pages@v4
+      
+    - name: スクリーンショットをアーティファクトとして保存
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: screenshots-${{ github.run_number }}
+        path: screenshots/
+        retention-days: 30
