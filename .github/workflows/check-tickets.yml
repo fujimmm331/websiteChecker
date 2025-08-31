@@ -44,9 +44,7 @@ jobs:
       env:
         BAYERN_USERNAME: ${{ secrets.BAYERN_USERNAME }}
         BAYERN_PASSWORD: ${{ secrets.BAYERN_PASSWORD }}
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-      run: npm run check
+      run: npx playwright test tests/bayern-ticket-test.spec.ts
       
     - name: 結果を保存
       uses: actions/cache/save@v3
