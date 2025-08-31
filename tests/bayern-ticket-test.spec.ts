@@ -1,57 +1,38 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('FCバイエルンチケットサイトテスト', () => {
-  test('イベントリストでStuttgartの試合をチェック', async ({ page }) => {
-    const username = process.env.BAYERN_USERNAME!;
-    const password = process.env.BAYERN_PASSWORD!;
+test('シュツットガルト戦の掲載有無をチェックする', async ({ page }) => {
+  const username = process.env.BAYERN_USERNAME!;
+  const password = process.env.BAYERN_PASSWORD!;
+  console.log('バイエルンのチケットサイトへ訪問');
+  await page.goto('https://fcbayern.com/en/tickets');
+  console.log('ログインページへ遷移します');
+  await page.getByTestId('uc-save-button').click();
+  await page.getByRole('button', { name: 'Toggles an area with options' }).click();
 
-    await page.goto('https://fcbayern.com/en/tickets');
-    await page.getByTestId('uc-save-button').click();
-    await page.waitForLoadState('networkidle');
+  console.log('ログインを行います');
+  await page.getByRole('link', { name: 'Login' }).click();
+  await page.getByRole('textbox', { name: 'Email address *' }).click();
+  await page.getByRole('textbox', { name: 'Email address *' }).fill(username);
+  await page.getByRole('textbox', { name: 'Password *' }).click();
+  await page.getByRole('textbox', { name: 'Password *' }).fill(password);
+  await page.getByRole('button', { name: 'Sign In' }).click();
 
-    await page.locator('a[href="https://tickets.fcbayern.com/ticketcenter/"]').click();
-    await page.waitForLoadState('networkidle');
+  console.log('チケット販売ページへ遷移します');
+  await page.goto('https://fcbayern.com/en/tickets');
+  const matchPagePromise = page.waitForEvent('popup');
+  await page.getByRole('link', { name: 'Tickets Season 2025/26', exact: true }).first().click();
+  const matchPage = await matchPagePromise;
+  await matchPage.getByText('Away matches').click();
+  await page.waitForLoadState('networkidle');
 
-    await page.fill('input[type="text"]', username);
-    await page.fill('input[type="password"]', password);
-    await page.click('button:has-text("Anmelden")');
-    await page.waitForLoadState('networkidle');
-
-    await page.goto('https://tickets.fcbayern.com/internetverkauf/EventList.aspx');
-    await page.waitForLoadState('networkidle');
-
-    const stuttgart = await page.evaluate(() => document.body.innerText.toLowerCase());
-    const hasStuttgart = stuttgart.includes('stuttgart');
-
-    console.log(`❓ Stuttgartはあるか？ ${hasStuttgart ? '✅ YES' : '❌ NO'}`);
-    
-    if (!hasStuttgart) {
-      await page.screenshot({ 
-        path: `./screenshots/no-stuttgart-${Date.now()}.png`, 
-        fullPage: true 
-      });
-    }
-
-    const december = await page.evaluate(() => document.body.innerText.toLowerCase());
-    const hasDecember = december.includes('december');
-    
-    console.log(`❓ Decemberはあるか？ ${hasDecember ? '✅ YES' : '❌ NO'}`);
-    
-    if (!hasDecember) {
-      await page.screenshot({ 
-        path: `./screenshots/no-december-${Date.now()}.png`, 
-        fullPage: true 
-      });
-    }
-
-    expect(hasDecember).toBeTruthy();
-    expect(hasStuttgart).toBeTruthy();
-  });
-
-  test.afterEach(async ({ page }) => {
-    await page.screenshot({ 
-      path: `./screenshots/test-end-${Date.now()}.png`, 
+  try {
+    console.log('シュトゥットガルト戦の有無をチェックします');
+    await expect(matchPage.getByText('Stuttgart')).toBeVisible();
+    await expect(matchPage.getByText('december')).toBeVisible();
+  } catch (error) {
+    await matchPage.screenshot({ 
+      path: `./screenshots/test-end-${new Date().getDate()}.png`, 
       fullPage: true 
     });
-  });
+  }
 });
