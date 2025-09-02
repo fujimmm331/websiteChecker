@@ -29,7 +29,7 @@ test('シュツットガルト戦の掲載有無をチェックする', async ({
     console.log('シュトゥットガルト戦の有無をチェックします');
     await expect(matchPage.getByText('Stuttgart')).toBeVisible();
     await expect(matchPage.getByText('december')).toBeVisible();
-  } catch (error) {
+  } finally {
     await matchPage.screenshot({ 
       path: `./screenshots/test-end-${new Date().getDate()}.png`, 
       fullPage: true 
