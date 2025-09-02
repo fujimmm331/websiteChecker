@@ -3,11 +3,16 @@ const path = require('path');
 
 function generateGallery() {
   const screenshotsDir = './screenshots';
-  const publicDir = './public';
+  const publicDir = './public/result';
   const publicScreenshotsDir = path.join(publicDir, 'screenshots');
   const resultsFile = path.join(publicDir, 'results.json');
 
-  // public/screenshots ディレクトリを作成
+  // public/result ディレクトリを作成
+  if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir, { recursive: true });
+  }
+  
+  // public/result/screenshots ディレクトリを作成
   if (!fs.existsSync(publicScreenshotsDir)) {
     fs.mkdirSync(publicScreenshotsDir, { recursive: true });
   }
@@ -227,10 +232,36 @@ function generateHTML(results) {
             font-style: italic;
             padding: 40px;
         }
+        .nav-link {
+            display: inline-block;
+            background-color: #dc143c;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background-color 0.2s;
+        }
+        .nav-link:hover {
+            background-color: #b91c3c;
+            color: white;
+            text-decoration: none;
+        }
+        .nav-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
     <main class="container">
+        <div class="nav-container">
+            <a href="https://fujimmm331.github.io/websiteChecker/" class="nav-link" target="_blank">
+                🏠 メインサイトに戻る
+            </a>
+        </div>
+        
         <h1>⚽ テスト実行結果</h1>
         
         <div class="status ${latestResult.status}">
@@ -311,7 +342,7 @@ function generateHTML(results) {
 </body>
 </html>`;
 
-  fs.writeFileSync('./public/index.html', html);
+  fs.writeFileSync(path.join('./public/result', 'index.html'), html);
 }
 
 // スクリプト実行
