@@ -23,7 +23,7 @@ test('シュツットガルト戦の掲載有無をチェックする', async ({
   await page.getByRole('link', { name: 'Tickets Season 2025/26', exact: true }).first().click();
   const matchPage = await matchPagePromise;
   await matchPage.getByText('Away matches').click();
-  await page.waitForLoadState('networkidle');
+  await matchPage.waitForLoadState('networkidle');
 
   try {
     console.log('シュトゥットガルト戦の有無をチェックします');
