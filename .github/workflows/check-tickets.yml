@@ -46,6 +46,11 @@ jobs:
         BAYERN_PASSWORD: ${{ secrets.BAYERN_PASSWORD }}
       run: npx playwright test tests/bayern-ticket-test.spec.ts
       
+    - name: テストレポートを公開ディレクトリにコピー
+      if: always()
+      run: |
+        cp -r playwright-report/* public/ 2>/dev/null || echo "No report files to copy"
+      
     - name: 結果を保存
       uses: actions/cache/save@v3
       with:
@@ -55,11 +60,13 @@ jobs:
         key: bayern-results-${{ github.run_number }}
         
     - name: GitHub Pages用ファイルをアップロード
+      if: always()
       uses: actions/upload-pages-artifact@v3
       with:
         path: ./public
         
     - name: GitHub Pagesにデプロイ
+      if: always()
       id: deployment
       uses: actions/deploy-pages@v4
       
