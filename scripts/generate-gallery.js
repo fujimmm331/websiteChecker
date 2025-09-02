@@ -40,14 +40,18 @@ function generateGallery() {
       .sort((a, b) => b.timestamp - a.timestamp);
   }
 
-  // 新しい結果エントリを作成
+  // 新しい結果エントリを作成（日本時間で記録）
+  const now = new Date();
+  const jstOffset = 9 * 60; // JST is UTC+9
+  const jstTime = new Date(now.getTime() + (jstOffset * 60 * 1000));
+  
   const currentResult = {
-    timestamp: new Date().toISOString(),
+    timestamp: jstTime.toISOString(),
     runId: process.env.GITHUB_RUN_NUMBER || Date.now().toString(),
     status: screenshots.length > 0 ? 'failed' : 'success',
     screenshots: screenshots.map(s => ({
       filename: s.filename,
-      timestamp: s.timestamp.toISOString(),
+      timestamp: new Date(s.timestamp.getTime() + (jstOffset * 60 * 1000)).toISOString(),
       size: s.size
     }))
   };
@@ -236,7 +240,7 @@ function generateHTML(results) {
         </div>
         
         <div class="last-check">
-            最終チェック: ${new Date(latestResult.timestamp).toLocaleString('ja-JP')}
+            最終チェック: ${new Date(latestResult.timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
         </div>
 
         ${latestResult.screenshots.length > 0 ? `
@@ -250,7 +254,7 @@ function generateHTML(results) {
                              loading="lazy">
                         <div class="screenshot-info">
                             <div class="screenshot-filename">${screenshot.filename}</div>
-                            <div class="screenshot-timestamp">${new Date(screenshot.timestamp).toLocaleString('ja-JP')}</div>
+                            <div class="screenshot-timestamp">${new Date(screenshot.timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}</div>
                         </div>
                     </div>
                 `).join('')}
@@ -269,7 +273,7 @@ function generateHTML(results) {
                         <span style="margin-right: 10px;">
                             ${result.status === 'success' ? '✅' : '❌'}
                         </span>
-                        ${new Date(result.timestamp).toLocaleString('ja-JP')}
+                        ${new Date(result.timestamp).toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' })}
                     </div>
                     <div>
                         ${result.screenshots.length > 0 ? `${result.screenshots.length}枚` : 'スクリーンショットなし'}
