@@ -45,6 +45,11 @@ jobs:
         BAYERN_USERNAME: ${{ secrets.BAYERN_USERNAME }}
         BAYERN_PASSWORD: ${{ secrets.BAYERN_PASSWORD }}
       run: npx playwright test tests/bayern-ticket-test.spec.ts
+
+    - name: テストレポートを公開ディレクトリにコピー
+      if: always()
+      run: |
+        cp -r playwright-report/* public/ 2>/dev/null || echo "No report files to copy"
       
     - name: スクリーンショットギャラリーを生成
       if: always()
