@@ -230,8 +230,8 @@ function generateHTML(results) {
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⚽ FCバイエルン チケットチェック</h1>
+    <main class="container">
+        <h1>⚽ テスト実行結果</h1>
         
         <div class="status ${latestResult.status}">
             ${latestResult.status === 'success' 
@@ -281,7 +281,7 @@ function generateHTML(results) {
                 </div>
             `).join('')}
         </div>
-    </div>
+    </main>
 
     <!-- Modal -->
     <div id="imageModal" class="modal" onclick="closeModal()">
