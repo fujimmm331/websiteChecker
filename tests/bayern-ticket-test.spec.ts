@@ -23,7 +23,10 @@ test('シュツットガルト戦の掲載有無をチェックする', async ({
   await page.getByRole('link', { name: 'Tickets Season 2025/26', exact: true }).first().click();
   const matchPage = await matchPagePromise;
   await matchPage.getByText('Away matches').click();
-  await matchPage.waitForLoadState('networkidle');
+  await matchPage.waitForResponse((response) => {
+    return response.url() === 'https://tickets.fcbayern.com/internetverkauf/EventList.aspx'
+      && response.status() === 200;
+  });
 
   try {
     console.log('シュトゥットガルト戦の有無をチェックします');
